@@ -37,7 +37,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
   bool isClearButtonDisabled = false;
   bool isSubmitButtonDisabled = true;
   bool isNSFW = false;
-  bool error = false;
 
   // final List<bool> _selectedPostType = <bool>[true, false, false];
   String image = '';
@@ -51,17 +50,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
     super.initState();
 
     _bodyTextController.addListener(() {
-      if (_bodyTextController.text.isEmpty && !isClearButtonDisabled)
-        setState(() => isClearButtonDisabled = true);
-      if (_bodyTextController.text.isNotEmpty && isClearButtonDisabled)
-        setState(() => isClearButtonDisabled = false);
+      if (_bodyTextController.text.isEmpty && !isClearButtonDisabled) setState(() => isClearButtonDisabled = true);
+      if (_bodyTextController.text.isNotEmpty && isClearButtonDisabled) setState(() => isClearButtonDisabled = false);
     });
 
     _titleTextController.addListener(() {
-      if (_titleTextController.text.isEmpty && !isSubmitButtonDisabled)
-        setState(() => isSubmitButtonDisabled = true);
-      if (_titleTextController.text.isNotEmpty && isSubmitButtonDisabled)
-        setState(() => isSubmitButtonDisabled = false);
+      if (_titleTextController.text.isEmpty && !isSubmitButtonDisabled) setState(() => isSubmitButtonDisabled = true);
+      if (_titleTextController.text.isNotEmpty && isSubmitButtonDisabled) setState(() => isSubmitButtonDisabled = false);
     });
   }
 
@@ -72,25 +67,22 @@ class _CreatePostPageState extends State<CreatePostPage> {
       appBar: AppBar(
         toolbarHeight: 70.0,
         actions: [
-          IconButton(
-              onPressed: () => setState(() => isNSFW = !isNSFW),
-              icon: isNSFW
-                  ? const Icon(Icons.eighteen_up_rating)
-                  : const Icon(Icons.eighteen_up_rating_outlined)),
+          IconButton(onPressed: () => setState(() => isNSFW = !isNSFW), icon: isNSFW ? const Icon(Icons.eighteen_up_rating) : const Icon(Icons.eighteen_up_rating_outlined)),
           IconButton(
             onPressed: isSubmitButtonDisabled
                 ? null
                 : () {
-                    image != ''
-                        ? context.read<CommunityBloc>().add(CreatePostEvent(
-                            name: _titleTextController.text,
-                            body: _bodyTextController.text,
-                            nsfw: isNSFW,
-                            url: image))
-                        : context.read<CommunityBloc>().add(CreatePostEvent(
-                            name: _titleTextController.text,
-                            body: _bodyTextController.text,
-                            nsfw: isNSFW));
+                    image != '' ? 
+                    context.read<CommunityBloc>().add(CreatePostEvent(
+                        name: _titleTextController.text,
+                        body: _bodyTextController.text,
+                        nsfw: isNSFW,
+                        url: image)) : 
+                      context.read<CommunityBloc>().add(CreatePostEvent(
+                        name: _titleTextController.text,
+                        body: _bodyTextController.text,
+                        nsfw: isNSFW
+                        ));
                     Navigator.of(context).pop();
                   },
             icon: const Icon(
@@ -111,9 +103,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
           }
           if (state.status == ImageStatus.success && image != state.imageUrl) {
             setState(() => image = state.imageUrl!);
-          }
-          if (state.status == ImageStatus.failure) {
-            setState(() => error = true);
           }
           if (state.status == ImageStatus.deleting) {
             setState(() => image = '');
@@ -176,12 +165,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      error
-                          ? const Text(
-                              'Error occured while uploading',
-                              textAlign: TextAlign.center,
-                            )
-                          : const SizedBox(height: 0),
                       image != ''
                           ? Stack(children: [
                               ExtendedImage.network(
@@ -214,7 +197,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   ? const Text("Upload Image")
                                   : const Text("Upload Image to the Body"),
                               onPressed: () async {
-                                error = false;
                                 final ImagePicker picker = ImagePicker();
                                 XFile? file = await picker.pickImage(
                                     source: ImageSource.gallery);
